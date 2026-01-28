@@ -11,5 +11,10 @@ Friday is a simple chatbot that helps you manage your tasks.
 
 ## Features
 
-### Echo
-Friday echoes back whatever you type. This is useful for testing.
+### Adding Tasks
+Simply type any text to add it as a task. Friday will confirm the addition and show the current task count.
+
+### Displaying Tasks
+Type `display` to see all your tasks.
+
+If you have no tasks yet, Friday will let you know.
