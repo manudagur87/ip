@@ -1,30 +1,15 @@
-# Duke User Guide
+# Friday User Guide
 
-// Update the title above to match the actual product name
+Friday is a simple chatbot that helps you manage your tasks.
 
-// Product screenshot goes here
+## Quick Start
 
-// Product intro goes here
+1. Make sure you have Java installed
+2. Run the program with `java Friday`
+3. Type commands and press enter
+4. Type `bye` to exit
 
-## Adding deadlines
+## Features
 
-// Describe the action and its outcome.
-
-// Give examples of usage
-
-Example: `keyword (optional arguments)`
-
-// A description of the expected outcome goes here
-
-```
-expected output
-```
-
-## Feature ABC
-
-// Feature details
-
-
-## Feature XYZ
-
-// Feature details
+### Echo
+Friday echoes back whatever you type. This is useful for testing.
