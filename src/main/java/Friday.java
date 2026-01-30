@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Friday {
-    private static String[] tasks = new String[100];
+    private static Task[] tasks = new Task[100];
 
     public static void main(String[] args) {
         String logo = "______________________________\n" +
@@ -26,7 +26,7 @@ public class Friday {
             input = inputScanner.nextLine();
             System.out.println(line);
 
-            if (input.equals("bye")) {
+            if (input.equalsIgnoreCase("bye")) {
                 System.out.println("Bye. Hope to see you never!");
                 System.out.println(line);
                 break;
@@ -39,16 +39,28 @@ public class Friday {
                 }
                 System.out.println("Here you go bro!");
                 for (int i = 0; i < taskCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+                    System.out.println(
+                            "[" + tasks[i].getStatusIcon() + "] " + (i + 1) + ". " + tasks[i].getDescription());
                 }
                 System.out.println(line);
                 continue;
             }
 
+            if (input.startsWith("mark")) {
+                int taskNumber = Integer.parseInt(input.substring(5));
+                tasks[taskNumber - 1].markAsDone();
+                continue;
+            }
+
+            if (input.startsWith("unmark")) {
+                int taskNumber = Integer.parseInt(input.substring(7));
+                tasks[taskNumber - 1].markAsNotDone();
+                continue;
+            }
+
             System.out.println("Added:" + input);
-            tasks[taskCount] = input;
+            tasks[taskCount] = new Task(input);
             taskCount++;
-            System.out.println(taskCount);
             System.out.println(line);
         }
 

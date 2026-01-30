@@ -18,3 +18,9 @@ Simply type any text to add it as a task. Friday will confirm the addition and s
 Type `display` to see all your tasks.
 
 If you have no tasks yet, Friday will let you know.
+
+### Marking Tasks
+Type `mark <task number>` to mark a task as done.
+
+### Unmarking Tasks
+Type `unmark <task number>` to unmark a task as not done.
