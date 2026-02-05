@@ -3,6 +3,7 @@ import java.util.Scanner;
 public class Friday {
 
     private static final int MAX_TASKS = 100;
+    private static final int COMMAND_SPLIT_LIMIT = 2;
     private static final String LINE = "____________________________________________________________";
 
     private static Task[] tasks = new Task[MAX_TASKS];
@@ -50,14 +51,14 @@ public class Friday {
                 handleEvent(input);
                 break;
             default:
-                printError("Unknown command. Available commands: todo, deadline, event, list, mark, unmark, bye");
+                printError("Unknown command: " + command);
                 break;
         }
         return false;
     }
 
     private static String getCommandWord(String input) {
-        String[] parts = input.split(" ", 2);
+        String[] parts = input.split(" ", COMMAND_SPLIT_LIMIT);
         return parts[0];
     }
 
