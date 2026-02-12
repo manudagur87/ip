@@ -1,4 +1,7 @@
+package friday;
+
 import java.util.Scanner;
+import friday.task.*;
 
 public class Friday {
 
