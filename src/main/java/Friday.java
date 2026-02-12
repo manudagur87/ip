@@ -50,6 +50,9 @@ public class Friday {
             case "event":
                 handleEvent(input);
                 break;
+            default:
+                System.out.println("error");
+                break;
         }
         return false;
     }
@@ -60,41 +63,105 @@ public class Friday {
     }
 
     private static void handleTodo(String input) {
-        String description = input.substring(4).trim();
-        addTask(new Todo(description));
+        try {
+            String description = input.substring(4).trim();
+            if (description.isEmpty()) {
+                System.out.println("error");
+                return;
+            }
+            addTask(new Todo(description));
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.println("error");
+        }
     }
 
     private static void handleDeadline(String input) {
-        String content = input.substring(8).trim();
-        String[] parts = content.split("/by", 2);
-        String description = parts[0].trim();
-        String by = parts[1].trim();
-        addTask(new Deadline(description, by));
+        try {
+            String content = input.substring(8).trim();
+            if (!content.contains("/by")) {
+                System.out.println("error");
+                return;
+            }
+            String[] parts = content.split("/by", 2);
+            String description = parts[0].trim();
+            String by = parts[1].trim();
+            if (description.isEmpty() || by.isEmpty()) {
+                System.out.println("error");
+                return;
+            }
+            addTask(new Deadline(description, by));
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.println("error");
+        }
     }
 
     private static void handleEvent(String input) {
-        String content = input.substring(5).trim();
-        String[] fromParts = content.split("/from", 2);
-        String description = fromParts[0].trim();
-        String[] toParts = fromParts[1].split("/to", 2);
-        String from = toParts[0].trim();
-        String to = toParts[1].trim();
-        addTask(new Event(description, from, to));
+        try {
+            String content = input.substring(5).trim();
+            if (!content.contains("/from") || !content.contains("/to")) {
+                System.out.println("error");
+                return;
+            }
+            String[] fromParts = content.split("/from", 2);
+            String description = fromParts[0].trim();
+            String[] toParts = fromParts[1].split("/to", 2);
+            String from = toParts[0].trim();
+            String to = toParts[1].trim();
+            if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                System.out.println("error");
+                return;
+            }
+            addTask(new Event(description, from, to));
+        } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
+            System.out.println("error");
+        }
     }
 
     private static void handleMark(String input) {
-        int taskNumber = Integer.parseInt(input.substring(4).trim());
-        tasks[taskNumber - 1].markAsDone();
-        printTaskMarked(taskNumber);
+        try {
+            int taskNumber = parseTaskNumber(input, "mark");
+            validateTaskNumber(taskNumber);
+            tasks[taskNumber - 1].markAsDone();
+            printTaskMarked(taskNumber);
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("error");
+        }
     }
 
     private static void handleUnmark(String input) {
-        int taskNumber = Integer.parseInt(input.substring(6).trim());
-        tasks[taskNumber - 1].markAsNotDone();
-        printTaskUnmarked(taskNumber);
+        try {
+            int taskNumber = parseTaskNumber(input, "unmark");
+            validateTaskNumber(taskNumber);
+            tasks[taskNumber - 1].markAsNotDone();
+            printTaskUnmarked(taskNumber);
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("error");
+        }
+    }
+
+    private static int parseTaskNumber(String input, String command) throws NumberFormatException {
+        String numberPart = input.substring(command.length()).trim();
+        if (numberPart.isEmpty()) {
+            throw new NumberFormatException("No number provided");
+        }
+        return Integer.parseInt(numberPart);
+    }
+
+    private static void validateTaskNumber(int taskNumber) throws IndexOutOfBoundsException {
+        if (taskNumber < 1 || taskNumber > taskCount || tasks[taskNumber - 1] == null) {
+            throw new IndexOutOfBoundsException("Invalid task number");
+        }
     }
 
     private static void addTask(Task task) {
+        if (taskCount >= MAX_TASKS) {
+            System.out.println("error");
+            return;
+        }
         tasks[taskCount] = task;
         taskCount++;
         printTaskAdded(task);
