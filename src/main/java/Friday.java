@@ -159,7 +159,7 @@ public class Friday {
 
     private static void addTask(Task task) {
         if (taskCount >= MAX_TASKS) {
-            printError("Task list is full. Cannot add more tasks.");
+            printError("Task list is full. I am not going to add more tasks.");
             return;
         }
         tasks[taskCount] = task;
