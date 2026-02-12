@@ -50,9 +50,6 @@ public class Friday {
             case "event":
                 handleEvent(input);
                 break;
-            default:
-                printError("Unknown command: " + command);
-                break;
         }
         return false;
     }
@@ -63,105 +60,41 @@ public class Friday {
     }
 
     private static void handleTodo(String input) {
-        try {
-            String description = input.substring(4).trim();
-            if (description.isEmpty()) {
-                printError("The description of a todo cannot be empty. Usage: todo <description>");
-                return;
-            }
-            addTask(new Todo(description));
-        } catch (StringIndexOutOfBoundsException e) {
-            printError("The description of a todo cannot be empty. Usage: todo <description>");
-        }
+        String description = input.substring(4).trim();
+        addTask(new Todo(description));
     }
 
     private static void handleDeadline(String input) {
-        try {
-            String content = input.substring(8).trim();
-            if (!content.contains("/by")) {
-                printError("Deadline must include /by. Usage: deadline <description> /by <date>");
-                return;
-            }
-            String[] parts = content.split("/by", 2);
-            String description = parts[0].trim();
-            String by = parts[1].trim();
-            if (description.isEmpty() || by.isEmpty()) {
-                printError("Deadline description and date cannot be empty.");
-                return;
-            }
-            addTask(new Deadline(description, by));
-        } catch (StringIndexOutOfBoundsException e) {
-            printError("Invalid deadline format. Usage: deadline <description> /by <date>");
-        }
+        String content = input.substring(8).trim();
+        String[] parts = content.split("/by", 2);
+        String description = parts[0].trim();
+        String by = parts[1].trim();
+        addTask(new Deadline(description, by));
     }
 
     private static void handleEvent(String input) {
-        try {
-            String content = input.substring(5).trim();
-            if (!content.contains("/from") || !content.contains("/to")) {
-                printError("Event must include /from and /to. Usage: event <description> /from <start> /to <end>");
-                return;
-            }
-            String[] fromParts = content.split("/from", 2);
-            String description = fromParts[0].trim();
-            String[] toParts = fromParts[1].split("/to", 2);
-            String from = toParts[0].trim();
-            String to = toParts[1].trim();
-            if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                printError("Event description, start time, and end time cannot be empty.");
-                return;
-            }
-            addTask(new Event(description, from, to));
-        } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
-            printError("Invalid event format. Usage: event <description> /from <start> /to <end>");
-        }
+        String content = input.substring(5).trim();
+        String[] fromParts = content.split("/from", 2);
+        String description = fromParts[0].trim();
+        String[] toParts = fromParts[1].split("/to", 2);
+        String from = toParts[0].trim();
+        String to = toParts[1].trim();
+        addTask(new Event(description, from, to));
     }
 
     private static void handleMark(String input) {
-        try {
-            int taskNumber = parseTaskNumber(input, "mark");
-            validateTaskNumber(taskNumber);
-            tasks[taskNumber - 1].markAsDone();
-            printTaskMarked(taskNumber);
-        } catch (NumberFormatException e) {
-            printError("Bro what? Enter a valid task number. Usage: mark <number>");
-        } catch (IndexOutOfBoundsException e) {
-            printError("Please enter a number in our expectation range.");
-        }
+        int taskNumber = Integer.parseInt(input.substring(4).trim());
+        tasks[taskNumber - 1].markAsDone();
+        printTaskMarked(taskNumber);
     }
 
     private static void handleUnmark(String input) {
-        try {
-            int taskNumber = parseTaskNumber(input, "unmark");
-            validateTaskNumber(taskNumber);
-            tasks[taskNumber - 1].markAsNotDone();
-            printTaskUnmarked(taskNumber);
-        } catch (NumberFormatException e) {
-            printError("Bro what? Enter a valid task number. Usage: unmark <number>");
-        } catch (IndexOutOfBoundsException e) {
-            printError("Please enter a number in our expectation range.");
-        }
-    }
-
-    private static int parseTaskNumber(String input, String command) throws NumberFormatException {
-        String numberPart = input.substring(command.length()).trim();
-        if (numberPart.isEmpty()) {
-            throw new NumberFormatException("No number provided");
-        }
-        return Integer.parseInt(numberPart);
-    }
-
-    private static void validateTaskNumber(int taskNumber) throws IndexOutOfBoundsException {
-        if (taskNumber < 1 || taskNumber > taskCount || tasks[taskNumber - 1] == null) {
-            throw new IndexOutOfBoundsException("Invalid task number");
-        }
+        int taskNumber = Integer.parseInt(input.substring(6).trim());
+        tasks[taskNumber - 1].markAsNotDone();
+        printTaskUnmarked(taskNumber);
     }
 
     private static void addTask(Task task) {
-        if (taskCount >= MAX_TASKS) {
-            printError("Task list is full. Cannot add more tasks.");
-            return;
-        }
         tasks[taskCount] = task;
         taskCount++;
         printTaskAdded(task);
@@ -169,11 +102,6 @@ public class Friday {
 
     private static void printLine() {
         System.out.println(LINE);
-    }
-
-    private static void printError(String message) {
-        System.out.println("Error: " + message);
-        printLine();
     }
 
     private static void printTaskAdded(Task task) {
