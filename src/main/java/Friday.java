@@ -51,7 +51,7 @@ public class Friday {
                 handleEvent(input);
                 break;
             default:
-                System.out.println("error");
+                printError("Unknown command: " + command);
                 break;
         }
         return false;
@@ -66,12 +66,12 @@ public class Friday {
         try {
             String description = input.substring(4).trim();
             if (description.isEmpty()) {
-                System.out.println("error");
+                printError("The description of a todo cannot be empty. Usage: todo <description>");
                 return;
             }
             addTask(new Todo(description));
         } catch (StringIndexOutOfBoundsException e) {
-            System.out.println("error");
+            printError("The description of a todo cannot be empty. Usage: todo <description>");
         }
     }
 
@@ -79,19 +79,19 @@ public class Friday {
         try {
             String content = input.substring(8).trim();
             if (!content.contains("/by")) {
-                System.out.println("error");
+                printError("Deadline must include /by. Usage: deadline <description> /by <date>");
                 return;
             }
             String[] parts = content.split("/by", 2);
             String description = parts[0].trim();
             String by = parts[1].trim();
             if (description.isEmpty() || by.isEmpty()) {
-                System.out.println("error");
+                printError("Deadline description and date cannot be empty.");
                 return;
             }
             addTask(new Deadline(description, by));
         } catch (StringIndexOutOfBoundsException e) {
-            System.out.println("error");
+            printError("Invalid deadline format. Usage: deadline <description> /by <date>");
         }
     }
 
@@ -99,7 +99,7 @@ public class Friday {
         try {
             String content = input.substring(5).trim();
             if (!content.contains("/from") || !content.contains("/to")) {
-                System.out.println("error");
+                printError("Event must include /from and /to. Usage: event <description> /from <start> /to <end>");
                 return;
             }
             String[] fromParts = content.split("/from", 2);
@@ -108,12 +108,12 @@ public class Friday {
             String from = toParts[0].trim();
             String to = toParts[1].trim();
             if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                System.out.println("error");
+                printError("Event description, start time, and end time cannot be empty.");
                 return;
             }
             addTask(new Event(description, from, to));
         } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("error");
+            printError("Invalid event format. Usage: event <description> /from <start> /to <end>");
         }
     }
 
@@ -124,9 +124,9 @@ public class Friday {
             tasks[taskNumber - 1].markAsDone();
             printTaskMarked(taskNumber);
         } catch (NumberFormatException e) {
-            System.out.println("error");
+            printError("Bro what? Enter a valid task number. Usage: mark <number>");
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("error");
+            printError("Please enter a number in our expectation range.");
         }
     }
 
@@ -137,9 +137,9 @@ public class Friday {
             tasks[taskNumber - 1].markAsNotDone();
             printTaskUnmarked(taskNumber);
         } catch (NumberFormatException e) {
-            System.out.println("error");
+            printError("Bro what? Enter a valid task number. Usage: unmark <number>");
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("error");
+            printError("Please enter a number in our expectation range.");
         }
     }
 
@@ -159,7 +159,7 @@ public class Friday {
 
     private static void addTask(Task task) {
         if (taskCount >= MAX_TASKS) {
-            System.out.println("error");
+            printError("Task list is full. Cannot add more tasks.");
             return;
         }
         tasks[taskCount] = task;
@@ -169,6 +169,11 @@ public class Friday {
 
     private static void printLine() {
         System.out.println(LINE);
+    }
+
+    private static void printError(String message) {
+        System.out.println("Error: " + message);
+        printLine();
     }
 
     private static void printTaskAdded(Task task) {
