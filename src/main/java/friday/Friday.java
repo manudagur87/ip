@@ -38,6 +38,9 @@ public class Friday {
             case "list":
                 printList();
                 break;
+            case "delete":
+                handleDelete(input);
+                break;
             case "mark":
                 handleMark(input);
                 break;
@@ -120,6 +123,24 @@ public class Friday {
         }
     }
 
+    private static void handleDelete(String input) {
+        try {
+            int taskNumber = parseTaskNumber(input, "delete");
+            validateTaskNumber(taskNumber);
+            Task deletedTask = tasks[taskNumber - 1];
+            for (int i = taskNumber - 1; i < taskCount - 1; i++) {
+                tasks[i] = tasks[i + 1];
+            }
+            tasks[taskCount - 1] = null;
+            taskCount--;
+            printTaskDeleted(deletedTask);
+        } catch (NumberFormatException e) {
+            printError("Bro what? Enter a valid task number. Usage: delete <number>");
+        } catch (IndexOutOfBoundsException e) {
+            printError("Please enter a number in our expectation range.");
+        }
+    }
+
     private static void handleMark(String input) {
         try {
             int taskNumber = parseTaskNumber(input, "mark");
@@ -193,6 +214,13 @@ public class Friday {
     private static void printTaskUnmarked(int taskNumber) {
         System.out.println("OK, I've marked this task as not done yet:");
         System.out.println("  " + tasks[taskNumber - 1]);
+        printLine();
+    }
+
+    private static void printTaskDeleted(Task task) {
+        System.out.println("Aight bro. I've removed this task:");
+        System.out.println("   " + task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
         printLine();
     }
 
