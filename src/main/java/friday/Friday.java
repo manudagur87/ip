@@ -135,6 +135,7 @@ public class Friday {
             tasks[taskCount - 1] = null;
             taskCount--;
             printTaskDeleted(deletedTask);
+            Storage.saveTasks(tasks, taskCount);
         } catch (NumberFormatException e) {
             printError("Bro what? Enter a valid task number. Usage: delete <number>");
         } catch (IndexOutOfBoundsException e) {
