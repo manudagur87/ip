@@ -15,6 +15,7 @@ public class Friday {
     public static void main(String[] args) {
         printWelcome();
         Scanner inputScanner = new Scanner(System.in);
+        taskCount = Storage.loadTasks(tasks);
 
         while (true) {
             String input = inputScanner.nextLine();
@@ -147,6 +148,7 @@ public class Friday {
             validateTaskNumber(taskNumber);
             tasks[taskNumber - 1].markAsDone();
             printTaskMarked(taskNumber);
+            Storage.saveTasks(tasks, taskCount);
         } catch (NumberFormatException e) {
             printError("Bro what? Enter a valid task number. Usage: mark <number>");
         } catch (IndexOutOfBoundsException e) {
@@ -160,6 +162,7 @@ public class Friday {
             validateTaskNumber(taskNumber);
             tasks[taskNumber - 1].markAsNotDone();
             printTaskUnmarked(taskNumber);
+            Storage.saveTasks(tasks, taskCount);
         } catch (NumberFormatException e) {
             printError("Bro what? Enter a valid task number. Usage: unmark <number>");
         } catch (IndexOutOfBoundsException e) {
@@ -189,6 +192,7 @@ public class Friday {
         tasks[taskCount] = task;
         taskCount++;
         printTaskAdded(task);
+        Storage.saveTasks(tasks, taskCount);
     }
 
     private static void printLine() {
