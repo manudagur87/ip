@@ -1,32 +1,31 @@
 package friday;
 
-import java.util.Scanner;
-import friday.task.*;
+import java.util.ArrayList;
+
+import friday.task.Deadline;
+import friday.task.Event;
+import friday.task.Task;
+import friday.task.Todo;
 
 public class Friday {
 
-    private static final int MAX_TASKS = 100;
     private static final int COMMAND_SPLIT_LIMIT = 2;
-    private static final String LINE = "____________________________________________________________";
-
-    private static Task[] tasks = new Task[MAX_TASKS];
-    private static int taskCount = 0;
+    private static Ui ui = new Ui();
+    private static ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
-        printWelcome();
-        Scanner inputScanner = new Scanner(System.in);
-        taskCount = Storage.loadTasks(tasks);
+        ui.showWelcome();
+        tasks = Storage.loadTasks();
 
         while (true) {
-            String input = inputScanner.nextLine();
-            printLine();
+            String input = ui.readCommand();
+            ui.showLine();
 
             if (processCommand(input)) {
                 break;
             }
         }
-
-        inputScanner.close();
+        ui.close();
     }
 
     private static boolean processCommand(String input) {
@@ -34,10 +33,10 @@ public class Friday {
 
         switch (command.toLowerCase()) {
             case "bye":
-                printBye();
+                ui.showBye();
                 return true;
             case "list":
-                printList();
+                ui.showTaskList(tasks);
                 break;
             case "delete":
                 handleDelete(input);
@@ -58,7 +57,7 @@ public class Friday {
                 handleEvent(input);
                 break;
             default:
-                printError("Unknown command: " + command);
+                ui.showError("Unknown command: " + command);
                 break;
         }
         return false;
@@ -73,12 +72,12 @@ public class Friday {
         try {
             String description = input.substring(4).trim();
             if (description.isEmpty()) {
-                printError("The description of a todo cannot be empty. Usage: todo <description>");
+                ui.showError("The description of a todo cannot be empty. Usage: todo <description>");
                 return;
             }
             addTask(new Todo(description));
         } catch (StringIndexOutOfBoundsException e) {
-            printError("The description of a todo cannot be empty. Usage: todo <description>");
+            ui.showError("The description of a todo cannot be empty. Usage: todo <description>");
         }
     }
 
@@ -86,19 +85,19 @@ public class Friday {
         try {
             String content = input.substring(8).trim();
             if (!content.contains("/by")) {
-                printError("Deadline must include /by. Usage: deadline <description> /by <date>");
+                ui.showError("Deadline must include /by. Usage: deadline <description> /by <date>");
                 return;
             }
             String[] parts = content.split("/by", 2);
             String description = parts[0].trim();
             String by = parts[1].trim();
             if (description.isEmpty() || by.isEmpty()) {
-                printError("Deadline description and date cannot be empty.");
+                ui.showError("Deadline description and date cannot be empty.");
                 return;
             }
             addTask(new Deadline(description, by));
         } catch (StringIndexOutOfBoundsException e) {
-            printError("Invalid deadline format. Usage: deadline <description> /by <date>");
+            ui.showError("Invalid deadline format. Usage: deadline <description> /by <date>");
         }
     }
 
@@ -106,7 +105,7 @@ public class Friday {
         try {
             String content = input.substring(5).trim();
             if (!content.contains("/from") || !content.contains("/to")) {
-                printError("Event must include /from and /to. Usage: event <description> /from <start> /to <end>");
+                ui.showError("Event must include /from and /to. Usage: event <description> /from <start> /to <end>");
                 return;
             }
             String[] fromParts = content.split("/from", 2);
@@ -115,12 +114,12 @@ public class Friday {
             String from = toParts[0].trim();
             String to = toParts[1].trim();
             if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                printError("Event description, start time, and end time cannot be empty.");
+                ui.showError("Event description, start time, and end time cannot be empty.");
                 return;
             }
             addTask(new Event(description, from, to));
         } catch (StringIndexOutOfBoundsException | ArrayIndexOutOfBoundsException e) {
-            printError("Invalid event format. Usage: event <description> /from <start> /to <end>");
+            ui.showError("Invalid event format. Usage: event <description> /from <start> /to <end>");
         }
     }
 
@@ -128,18 +127,13 @@ public class Friday {
         try {
             int taskNumber = parseTaskNumber(input, "delete");
             validateTaskNumber(taskNumber);
-            Task deletedTask = tasks[taskNumber - 1];
-            for (int i = taskNumber - 1; i < taskCount - 1; i++) {
-                tasks[i] = tasks[i + 1];
-            }
-            tasks[taskCount - 1] = null;
-            taskCount--;
-            printTaskDeleted(deletedTask);
-            Storage.saveTasks(tasks, taskCount);
+            Task deletedTask = tasks.remove(taskNumber - 1);
+            ui.showTaskDeleted(deletedTask, tasks.size());
+            Storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
-            printError("Bro what? Enter a valid task number. Usage: delete <number>");
+            ui.showError("Bro what? Enter a valid task number. Usage: delete <number>");
         } catch (IndexOutOfBoundsException e) {
-            printError("Please enter a number in our expectation range.");
+            ui.showError("Please enter a number in our expectation range.");
         }
     }
 
@@ -147,13 +141,13 @@ public class Friday {
         try {
             int taskNumber = parseTaskNumber(input, "mark");
             validateTaskNumber(taskNumber);
-            tasks[taskNumber - 1].markAsDone();
-            printTaskMarked(taskNumber);
-            Storage.saveTasks(tasks, taskCount);
+            tasks.get(taskNumber - 1).markAsDone();
+            ui.showTaskMarked(tasks.get(taskNumber - 1));
+            Storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
-            printError("Bro what? Enter a valid task number. Usage: mark <number>");
+            ui.showError("Bro what? Enter a valid task number. Usage: mark <number>");
         } catch (IndexOutOfBoundsException e) {
-            printError("Please enter a number in our expectation range.");
+            ui.showError("Please enter a number in our expectation range.");
         }
     }
 
@@ -161,13 +155,13 @@ public class Friday {
         try {
             int taskNumber = parseTaskNumber(input, "unmark");
             validateTaskNumber(taskNumber);
-            tasks[taskNumber - 1].markAsNotDone();
-            printTaskUnmarked(taskNumber);
-            Storage.saveTasks(tasks, taskCount);
+            tasks.get(taskNumber - 1).markAsNotDone();
+            ui.showTaskUnmarked(tasks.get(taskNumber - 1));
+            Storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
-            printError("Bro what? Enter a valid task number. Usage: unmark <number>");
+            ui.showError("Bro what? Enter a valid task number. Usage: unmark <number>");
         } catch (IndexOutOfBoundsException e) {
-            printError("Please enter a number in our expectation range.");
+            ui.showError("Please enter a number in our expectation range.");
         }
     }
 
@@ -180,84 +174,14 @@ public class Friday {
     }
 
     private static void validateTaskNumber(int taskNumber) throws IndexOutOfBoundsException {
-        if (taskNumber < 1 || taskNumber > taskCount || tasks[taskNumber - 1] == null) {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new IndexOutOfBoundsException("Invalid task number");
         }
     }
 
     private static void addTask(Task task) {
-        if (taskCount >= MAX_TASKS) {
-            printError("Task list is full. I am not going to add more tasks.");
-            return;
-        }
-        tasks[taskCount] = task;
-        taskCount++;
-        printTaskAdded(task);
-        Storage.saveTasks(tasks, taskCount);
-    }
-
-    private static void printLine() {
-        System.out.println(LINE);
-    }
-
-    private static void printError(String message) {
-        System.out.println("Error: " + message);
-        printLine();
-    }
-
-    private static void printTaskAdded(Task task) {
-        System.out.println("Added: " + task);
-        printLine();
-    }
-
-    private static void printTaskMarked(int taskNumber) {
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.println("  " + tasks[taskNumber - 1]);
-        printLine();
-    }
-
-    private static void printTaskUnmarked(int taskNumber) {
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.println("  " + tasks[taskNumber - 1]);
-        printLine();
-    }
-
-    private static void printTaskDeleted(Task task) {
-        System.out.println("Aight bro. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
-        printLine();
-    }
-
-    private static void printList() {
-        if (taskCount == 0) {
-            System.out.println("You have no tasks yet.");
-            printLine();
-            return;
-        }
-        System.out.println("Here you go bro!");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println((i + 1) + "." + tasks[i]);
-        }
-        printLine();
-    }
-
-    private static void printBye() {
-        System.out.println("Bye. Hope to see you never!");
-        printLine();
-    }
-
-    private static void printWelcome() {
-        String logo = "______________________________\n" +
-                "|  ________________________  |\n" +
-                "| |                        | |\n" +
-                "| |       FRIDAY           | |\n" +
-                "| |________________________| |\n" +
-                "|____________________________|\n";
-        printLine();
-        System.out.println("Hello I'm\n" + logo + "What can I not do for you?");
-        printLine();
-        System.out.println("Type 'bye' to exit and never come back.");
-        System.out.println("Type 'list' to display all tasks.");
+        tasks.add(task);
+        ui.showTaskAdded(task);
+        Storage.saveTasks(tasks);
     }
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import friday.task.Deadline;
@@ -17,12 +18,12 @@ public class Storage {
 
     private static final Path FILE_PATH = Paths.get("data", "friday.txt");
 
-    public static void saveTasks(Task[] tasks, int taskCount) {
+    public static void saveTasks(ArrayList<Task> tasks) {
         try {
             Files.createDirectories(FILE_PATH.getParent());
             FileWriter writer = new FileWriter(FILE_PATH.toFile());
-            for (int i = 0; i < taskCount; i++) {
-                writer.write(taskToFileString(tasks[i]) + System.lineSeparator());
+            for (Task task : tasks) {
+                writer.write(taskToFileString(task) + System.lineSeparator());
             }
             writer.close();
         } catch (IOException e) {
@@ -30,13 +31,13 @@ public class Storage {
         }
     }
 
-    public static int loadTasks(Task[] tasks) {
+    public static ArrayList<Task> loadTasks() {
+        ArrayList<Task> tasks = new ArrayList<>();
         File file = FILE_PATH.toFile();
         if (!file.exists()) {
-            return 0;
+            return tasks;
         }
 
-        int count = 0;
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
@@ -46,15 +47,14 @@ public class Storage {
                 }
                 Task task = parseTask(line);
                 if (task != null) {
-                    tasks[count] = task;
-                    count++;
+                    tasks.add(task);
                 }
             }
             scanner.close();
         } catch (IOException e) {
             System.out.println("Error loading tasks: " + e.getMessage());
         }
-        return count;
+        return tasks;
     }
 
     private static String taskToFileString(Task task) {
