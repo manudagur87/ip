@@ -1,6 +1,8 @@
 package friday;
 
 import friday.task.Task;
+import main.java.friday.TaskList;
+import main.java.friday.Ui;
 
 public class Friday {
 
@@ -93,7 +95,15 @@ public class Friday {
         }
     }
 
-
+    private void handleFind(String input) {
+        try {
+            String keyword = Parser.parseFindKeyword(input);
+            java.util.ArrayList<Task> results = tasks.findTasks(keyword);
+            ui.showSearchResults(results);
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
+        }
+    }
 
     private void handleDelete(String input) {
         try {
