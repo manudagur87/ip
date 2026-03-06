@@ -5,14 +5,29 @@ import friday.task.Event;
 import friday.task.Task;
 import friday.task.Todo;
 
+/**
+ * Parses raw user input into commands and task objects.
+ */
 public class Parser {
     private static final int COMMAND_SPLIT_LIMIT = 2;
 
+    /**
+     * Extracts the first word of the input as the command.
+     *
+     * @param input full user input
+     * @return command word
+     */
     public static String getCommandWord(String input) {
         String[] parts = input.split(" ", COMMAND_SPLIT_LIMIT);
         return parts[0];
     }
 
+    /**
+     * Parses a todo command into a {@code Todo} task.
+     *
+     * @param input full todo command
+     * @return parsed task
+     */
     public static Task parseTodo(String input) {
         try {
             String description = input.substring(4).trim();
@@ -25,6 +40,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses a deadline command into a {@code Deadline} task.
+     *
+     * @param input full deadline command
+     * @return parsed task
+     */
     public static Task parseDeadline(String input) {
         try {
             String content = input.substring(8).trim();
@@ -43,6 +64,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses an event command into an {@code Event} task.
+     *
+     * @param input full event command
+     * @return parsed task
+     */
     public static Task parseEvent(String input) {
         try {
             String content = input.substring(5).trim();
@@ -63,6 +90,13 @@ public class Parser {
         }
     }
 
+    /**
+     * Parses the task number portion of a command.
+     *
+     * @param input full command input
+     * @param command command keyword prefix
+     * @return parsed task number
+     */
     public static int parseTaskNumber(String input, String command) {
         String numberPart = input.substring(command.length()).trim();
         if (numberPart.isEmpty()) {
@@ -71,6 +105,12 @@ public class Parser {
         return Integer.parseInt(numberPart);
     }
 
+    /**
+     * Parses the keyword used for find.
+     *
+     * @param input full find command
+     * @return keyword string
+     */
     public static String parseFindKeyword(String input) {
         String keyword = input.substring(4).trim();
         if (keyword.isEmpty()) {
