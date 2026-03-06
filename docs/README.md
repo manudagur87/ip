@@ -4,23 +4,47 @@ Friday is a simple chatbot that helps you manage your tasks.
 
 ## Quick Start
 
-1. Make sure you have Java installed
-2. Run the program with `java Friday`
-3. Type commands and press enter
-4. Type `bye` to exit
+1. Make sure Java is installed.
+2. Start Friday.
+3. Type a command and press Enter.
+4. Type `bye` to exit.
 
 ## Features
 
-### Adding Tasks
-Simply type any text to add it as a task. Friday will confirm the addition and show the current task count.
+### View all tasks
+Use `list` to show all tasks.
 
-### Displaying Tasks
-Type `display` to see all your tasks.
+### Add a todo
+Use `todo <description>`
 
-If you have no tasks yet, Friday will let you know.
+Example: `todo read book`
 
-### Marking Tasks
-Type `mark <task number>` to mark a task as done.
+### Add a deadline
+Use `deadline <description> /by <date>`
 
-### Unmarking Tasks
-Type `unmark <task number>` to unmark a task as not done.
+Example: `deadline submit report /by Friday`
+
+### Add an event
+Use `event <description> /from <start> /to <end>`
+
+Example: `event project meeting /from 2pm /to 4pm`
+
+### Mark a task as done
+Use `mark <task number>`
+
+Example: `mark 2`
+
+### Unmark a task
+Use `unmark <task number>`
+
+Example: `unmark 2`
+
+### Delete a task
+Use `delete <task number>`
+
+Example: `delete 3`
+
+### Find tasks by keyword
+Use `find <keyword>`
+
+Example: `find report`
