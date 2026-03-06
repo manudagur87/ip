@@ -1,18 +1,25 @@
 package friday;
 
-import java.util.ArrayList;
-
 import friday.task.Task;
 
 public class Friday {
 
-    private static Ui ui = new Ui();
-    private static ArrayList<Task> tasks = new ArrayList<>();
+    private final Ui ui;
+    private final Storage storage;
+    private final TaskList tasks;
+
+    public Friday(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        tasks = storage.loadTasks();
+    }
 
     public static void main(String[] args) {
-        ui.showWelcome();
-        tasks = Storage.loadTasks();
+        new Friday("data/friday.txt").run();
+    }
 
+    public void run() {
+        ui.showWelcome();
         while (true) {
             String input = ui.readCommand();
             ui.showLine();
@@ -24,7 +31,7 @@ public class Friday {
         ui.close();
     }
 
-    private static boolean processCommand(String input) {
+    private boolean processCommand(String input) {
         String command = Parser.getCommandWord(input);
 
         switch (command.toLowerCase()) {
@@ -32,7 +39,7 @@ public class Friday {
                 ui.showBye();
                 return true;
             case "list":
-                ui.showTaskList(tasks);
+                ui.showTaskList(tasks.getTasks());
                 break;
             case "delete":
                 handleDelete(input);
@@ -59,51 +66,49 @@ public class Friday {
         return false;
     }
 
-    private static void handleTodo(String input) {
+    private void handleTodo(String input) {
         try {
             addTask(Parser.parseTodo(input));
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage()); // Show specific error message for todo parsing issues
+            ui.showError(e.getMessage());
         }
     }
 
-    private static void handleDeadline(String input) {
+    private void handleDeadline(String input) {
         try {
             addTask(Parser.parseDeadline(input));
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage()); // Show specific error message for deadline parsing issues
+            ui.showError(e.getMessage());
         }
     }
 
-    private static void handleEvent(String input) {
+    private void handleEvent(String input) {
         try {
             addTask(Parser.parseEvent(input));
         } catch (IllegalArgumentException e) {
-            ui.showError(e.getMessage()); // Show specific error message for event parsing issues
+            ui.showError(e.getMessage());
         }
     }
 
-    private static void handleDelete(String input) {
+    private void handleDelete(String input) {
         try {
             int taskNumber = Parser.parseTaskNumber(input, "delete");
-            validateTaskNumber(taskNumber);
-            Task deletedTask = tasks.remove(taskNumber - 1);
+            Task deletedTask = tasks.deleteTask(taskNumber);
             ui.showTaskDeleted(deletedTask, tasks.size());
-            Storage.saveTasks(tasks);
+            storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
             ui.showError("Bro what? Enter a valid task number. Usage: delete <number>");
         } catch (IndexOutOfBoundsException e) {
-            ui.showError("Please enter a number in our expectation range."); // Show specific error message for invalid task numbers
+            ui.showError("Please enter a number in our expectation range.");
         }
     }
 
-    private static void handleMark(String input) {
+    private void handleMark(String input) {
         try {
             int taskNumber = Parser.parseTaskNumber(input, "mark");
-            validateTaskNumber(taskNumber);
-            tasks.get(taskNumber - 1).markAsDone();
-            ui.showTaskMarked(tasks.get(taskNumber - 1));
-            Storage.saveTasks(tasks);
+            tasks.markTask(taskNumber);
+            ui.showTaskMarked(tasks.getTask(taskNumber));
+            storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
             ui.showError("Bro what? Enter a valid task number. Usage: mark <number>");
         } catch (IndexOutOfBoundsException e) {
@@ -111,13 +116,12 @@ public class Friday {
         }
     }
 
-    private static void handleUnmark(String input) {
+    private void handleUnmark(String input) {
         try {
             int taskNumber = Parser.parseTaskNumber(input, "unmark");
-            validateTaskNumber(taskNumber);
-            tasks.get(taskNumber - 1).markAsNotDone();
-            ui.showTaskUnmarked(tasks.get(taskNumber - 1));
-            Storage.saveTasks(tasks);
+            tasks.unmarkTask(taskNumber);
+            ui.showTaskUnmarked(tasks.getTask(taskNumber));
+            storage.saveTasks(tasks);
         } catch (NumberFormatException e) {
             ui.showError("Bro what? Enter a valid task number. Usage: unmark <number>");
         } catch (IndexOutOfBoundsException e) {
@@ -125,15 +129,9 @@ public class Friday {
         }
     }
 
-    private static void validateTaskNumber(int taskNumber) throws IndexOutOfBoundsException {
-        if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new IndexOutOfBoundsException("Invalid task number");
-        }
-    }
-
-    private static void addTask(Task task) {
-        tasks.add(task);
+    private void addTask(Task task) {
+        tasks.addTask(task);
         ui.showTaskAdded(task);
-        Storage.saveTasks(tasks);
+        storage.saveTasks(tasks);
     }
 }

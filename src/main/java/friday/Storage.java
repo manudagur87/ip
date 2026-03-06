@@ -16,13 +16,17 @@ import friday.task.Todo;
 
 public class Storage {
 
-    private static final Path FILE_PATH = Paths.get("data", "friday.txt");
+    private final Path filePath;
 
-    public static void saveTasks(ArrayList<Task> tasks) {
+    public Storage(String filePath) {
+        this.filePath = Paths.get(filePath);
+    }
+
+    public void saveTasks(TaskList tasks) {
         try {
-            Files.createDirectories(FILE_PATH.getParent());
-            FileWriter writer = new FileWriter(FILE_PATH.toFile());
-            for (Task task : tasks) {
+            Files.createDirectories(filePath.getParent());
+            FileWriter writer = new FileWriter(filePath.toFile());
+            for (Task task : tasks.getTasks()) {
                 writer.write(taskToFileString(task) + System.lineSeparator());
             }
             writer.close();
@@ -31,11 +35,11 @@ public class Storage {
         }
     }
 
-    public static ArrayList<Task> loadTasks() {
+    public TaskList loadTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
-        File file = FILE_PATH.toFile();
+        File file = filePath.toFile();
         if (!file.exists()) {
-            return tasks;
+            return new TaskList(tasks);
         }
 
         try {
@@ -54,7 +58,7 @@ public class Storage {
         } catch (IOException e) {
             System.out.println("Error loading tasks: " + e.getMessage());
         }
-        return tasks;
+        return new TaskList(tasks);
     }
 
     private static String taskToFileString(Task task) {
