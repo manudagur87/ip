@@ -1,6 +1,8 @@
 package friday;
 
 import friday.task.Task;
+import main.java.friday.TaskList;
+import main.java.friday.Ui;
 
 public class Friday {
 
