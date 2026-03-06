@@ -14,14 +14,27 @@ import friday.task.Event;
 import friday.task.Task;
 import friday.task.Todo;
 
+/**
+ * Handles saving and loading tasks from disk.
+ */
 public class Storage {
 
     private final Path filePath;
 
+    /**
+     * Creates a storage instance bound to a file path.
+     *
+     * @param filePath storage file path
+     */
     public Storage(String filePath) {
         this.filePath = Paths.get(filePath);
     }
 
+    /**
+     * Saves all tasks to the configured file path.
+     *
+     * @param tasks task list to persist
+     */
     public void saveTasks(TaskList tasks) {
         try {
             Files.createDirectories(filePath.getParent());
@@ -35,6 +48,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Loads tasks from disk into a {@code TaskList}.
+     *
+     * @return loaded task list
+     */
     public TaskList loadTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = filePath.toFile();
