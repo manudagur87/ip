@@ -1,25 +1,39 @@
 package friday;
 
 import friday.task.Task;
-import main.java.friday.TaskList;
-import main.java.friday.Ui;
 
+/**
+ * Entry point and main application loop for Friday.
+ */
 public class Friday {
 
     private final Ui ui;
     private final Storage storage;
     private final TaskList tasks;
 
+    /**
+     * Creates a Friday app instance with storage at the given file path.
+     *
+     * @param filePath path to the task storage file
+     */
     public Friday(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
         tasks = storage.loadTasks();
     }
 
+    /**
+     * Starts the application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         new Friday("data/friday.txt").run();
     }
 
+    /**
+     * Runs the command loop until the user exits.
+     */
     public void run() {
         ui.showWelcome();
         while (true) {
