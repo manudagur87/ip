@@ -70,4 +70,12 @@ public class Parser {
         }
         return Integer.parseInt(numberPart);
     }
+
+    public static String parseFindKeyword(String input) {
+        String keyword = input.substring(4).trim();
+        if (keyword.isEmpty()) {
+            throw new IllegalArgumentException("Please provide a keyword to search for.");
+        }
+        return keyword;
+    }
 }

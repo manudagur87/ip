@@ -59,6 +59,9 @@ public class Friday {
             case "event":
                 handleEvent(input);
                 break;
+            case "find":
+                handleFind(input);
+                break;
             default:
                 ui.showError("Unknown command: " + command);
                 break;
@@ -85,6 +88,16 @@ public class Friday {
     private void handleEvent(String input) {
         try {
             addTask(Parser.parseEvent(input));
+        } catch (IllegalArgumentException e) {
+            ui.showError(e.getMessage());
+        }
+    }
+
+    private void handleFind(String input) {
+        try {
+            String keyword = Parser.parseFindKeyword(input);
+            java.util.ArrayList<Task> results = tasks.findTasks(keyword);
+            ui.showSearchResults(results);
         } catch (IllegalArgumentException e) {
             ui.showError(e.getMessage());
         }

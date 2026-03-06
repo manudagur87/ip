@@ -81,6 +81,19 @@ public class Ui {
         showLine();
     }
 
+    public void showSearchResults(java.util.ArrayList<Task> results) {
+        if (results.isEmpty()) {
+            System.out.println("No matching tasks found.");
+            showLine();
+            return;
+        }
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < results.size(); i++) {
+            System.out.println((i + 1) + "." + results.get(i));
+        }
+        showLine();
+    }
+
     public void close() {
         inputScanner.close();
     }
