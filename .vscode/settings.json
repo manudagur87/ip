@@ -6,5 +6,8 @@
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "editor.formatOnPaste": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "java.project.sourcePaths": [
+        "src/main/java"
+    ]
 }
